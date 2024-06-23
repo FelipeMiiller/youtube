@@ -17,7 +17,9 @@ Essa ferramenta é ideal para pessoas que desejam armazenar vídeos do YouTube l
 
 - Python 3.6+
 - Pip
-- Pytube
+- pytube
+- tqdm
+- moviepy
 
 
 ## Como utilizar?
