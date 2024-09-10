@@ -1,7 +1,7 @@
-from pytube import YouTube, Playlist
-from tqdm import tqdm
-from moviepy.editor import VideoFileClip
 import os
+from moviepy.editor import VideoFileClip
+from tqdm import tqdm
+from pytubefix import Playlist, YouTube
 
 
 def show_progress_bar(stream, _chunk, _file_handle, bytes_remaining, pbar):
@@ -38,7 +38,7 @@ def file_exists(path):
 def download_video(url, output_path=None, video_only=True):
     try:
         # Verifica se a URL é de uma playlist
-        if 'list=' in url:
+        if "list=" in url:
             playlist = Playlist(url)
             for video_url in playlist.video_urls:
                 download_single_video(video_url, output_path, video_only)
@@ -66,14 +66,18 @@ def download_single_video(url, output_path=None, video_only=True):
 
         # Verifica se o arquivo já existe
         if file_exists(path_stream):
-            print(
-                f"O arquivo {filename} já existe. Pulando para o próximo vídeo.")
+            print(f"O arquivo {filename} já existe. Pulando para o próximo vídeo.")
             return
 
         # Download do vídeo ou áudio
-        with tqdm(total=stream.filesize, unit='B', unit_scale=True, desc="Baixando") as pbar:
-            yt.register_on_progress_callback(lambda stream, chunk, bytes_remaining: show_progress_bar(
-                stream, chunk, None, bytes_remaining, pbar))
+        with tqdm(
+            total=stream.filesize, unit="B", unit_scale=True, desc="Baixando"
+        ) as pbar:
+            yt.register_on_progress_callback(
+                lambda stream, chunk, bytes_remaining: show_progress_bar(
+                    stream, chunk, None, bytes_remaining, pbar
+                )
+            )
             stream.download(output_path, filename=path_stream)
         print(f"Baixando: {path_stream}")
 
@@ -94,6 +98,21 @@ def download_single_video(url, output_path=None, video_only=True):
         print(f"Ocorreu um erro durante o download do vídeo {url}: {e}")
 
 
+def options(option: str):
+
+    match option:
+        case "1":
+            video_url = input("Digite a URL do YouTube: ")
+            download_video(video_url, video_only=True)
+        case "2":
+            video_url = input("Digite a URL do YouTube: ")
+            download_video(video_url, video_only=False)
+        case "3":
+            print("Saindo...")
+        case _:
+            print("Opção inválida. Tente novamente.")
+
+
 if __name__ == "__main__":
     while True:
         print("\nMenu:")
@@ -101,15 +120,4 @@ if __name__ == "__main__":
         print("2. Baixar áudios de uma playlist do YouTube")
         print("3. Sair")
         choice = input("Escolha uma opção: ")
-
-        if choice == '1':
-            playlist_url = input("Digite a URL da playlist do YouTube: ")
-            download_video(playlist_url, video_only=True)
-        elif choice == '2':
-            playlist_url = input("Digite a URL da playlist do YouTube: ")
-            download_video(playlist_url, video_only=False)
-        elif choice == '3':
-            print("Saindo...")
-            break
-        else:
-            print("Opção inválida. Tente novamente.")
+        options(choice)
